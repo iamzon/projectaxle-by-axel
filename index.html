@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111313">
+    <title>AXEL — Mars Mission Control</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="wordmark" href="#" aria-label="AXEL home">
+          <span class="wordmark-icon" aria-hidden="true">A</span>
+          <span>AXEL<span class="wordmark-period">.</span></span>
+        </a>
+        <div class="topbar-center">
+          <span class="live-dot"></span>
+          <span>MISSION CONTROL</span>
+          <span class="topbar-divider">/</span>
+          <span id="mission-id">MARS-01</span>
+        </div>
+        <button class="icon-button" id="help-button" aria-label="How to play" title="How to play">?</button>
+      </header>
+
+      <div class="slide-viewport">
+        <div class="slide-track" id="slide-track">
+          <section class="app-slide mission-slide" id="mission-slide" aria-label="Mission control" aria-hidden="false">
+      <main>
+        <section class="mission-heading">
+          <div class="heading-copy">
+            <p class="eyebrow"><span id="phase-eyebrow">MISSION DESIGN</span><span class="eyebrow-separator">•</span><span id="sol-label">SOL 001 / 014</span></p>
+            <h1>Keep the crew <span>alive.</span></h1>
+            <p class="heading-subtitle">A mission is only as strong as the systems that sustain it.</p>
+          </div>
+          <div class="crew-status">
+            <div class="crew-avatars" aria-hidden="true"><span>AM</span><span>JK</span><span>RL</span><span>TS</span></div>
+            <div><span class="crew-count">4 CREW</span><span class="crew-caption">ALL SYSTEMS NOMINAL</span></div>
+          </div>
+        </section>
+
+        <section class="phase-track" aria-label="Mission segments">
+          <div class="phase-step current" data-phase="Launch"><span class="phase-number">01</span><span class="phase-name">Launch</span><span class="phase-caption">DESIGN & DEPLOY</span></div>
+          <span class="phase-connector"></span>
+          <div class="phase-step" data-phase="Space"><span class="phase-number">02</span><span class="phase-name">Space</span><span class="phase-caption">TRANSIT</span></div>
+          <span class="phase-connector"></span>
+          <div class="phase-step" data-phase="Ground"><span class="phase-number">03</span><span class="phase-name">Ground</span><span class="phase-caption">SURFACE OPS</span></div>
+          <span class="phase-connector"></span>
+          <div class="phase-step" data-phase="User"><span class="phase-number">04</span><span class="phase-name">User</span><span class="phase-caption">CREW & SCIENCE</span></div>
+        </section>
+
+        <section class="world-panel" id="world-panel" aria-label="Interactive 3D Mars surface simulation">
+          <canvas id="mars-canvas" tabindex="0" aria-label="3D view of the Mars mission base. Drag to orbit, scroll to zoom, or use WASD keys."></canvas>
+          <div class="world-topline">
+            <div><span class="world-live"><span class="live-dot"></span>LIVE SIMULATION</span><span class="world-divider">/</span><span id="world-location">LANDING SITE · JEZERO CRATER</span></div>
+            <span class="world-sol" id="world-sol">SOL 001 / 014 <span>·</span> 18.4° N, 77.5° E</span>
+          </div>
+          <button class="edge-tab edge-tab-left" id="left-hud-toggle" type="button" aria-controls="left-hud-content" aria-expanded="false"><span>MISSION PLAN</span><b aria-hidden="true">›</b></button>
+          <button class="edge-tab edge-tab-right" id="right-hud-toggle" type="button" aria-controls="right-hud-content" aria-expanded="false" hidden><b aria-hidden="true">‹</b><span>FLIGHT DATA</span></button>
+          <div class="world-hud" aria-label="Mission control overlay">
+            <div class="hud-column hud-left" id="left-hud">
+              <div class="hud-drawer-content" id="left-hud-content">
+              <section class="panel budget-panel">
+                <div class="panel-heading">
+                  <div><p class="eyebrow">MISSION CONSTRAINTS</p><h2>Payload budgets</h2></div>
+                  <span class="constraint-tag"><span class="tiny-diamond"></span> HARD LIMITS</span>
+                </div>
+                <div class="budget-meters">
+                  <div class="budget-meter">
+                    <div class="meter-heading"><span>LAUNCH MASS</span><span class="meter-value"><b id="mass-used">0</b><span id="mass-limit"> / 1,250 kg</span></span></div>
+                    <div class="meter-track"><span class="meter-fill mass-fill" id="mass-fill"></span></div>
+                    <div class="meter-foot"><span>Payload capacity</span><span id="mass-remaining">1,250 kg remaining</span></div>
+                  </div>
+                  <div class="budget-meter">
+                    <div class="meter-heading"><span>AVAILABLE POWER</span><span class="meter-value"><b id="power-used">0</b><span id="power-limit"> / 125 kW</span></span></div>
+                    <div class="meter-track"><span class="meter-fill power-fill" id="power-fill"></span></div>
+                    <div class="meter-foot"><span>Generation capacity</span><span id="power-remaining">125 kW remaining</span></div>
+                  </div>
+                </div>
+                <div class="budget-note"><span class="info-mark">i</span><span>Every kilogram and kilowatt has a cost. Prioritize what keeps your crew alive.</span></div>
+                <details class="forecast-brief">
+                  <summary class="forecast-heading"><span>MISSION WEATHER FORECAST</span><span class="forecast-tag" id="forecast-range">SOL 02–14</span></summary>
+                  <div class="forecast-list" id="forecast-list"></div>
+                  <p class="forecast-note" id="forecast-note">Each listed event is rolled once per Sol. Odds refresh every mission.</p>
+                </details>
+              </section>
+
+              <section class="panel objectives-panel" aria-labelledby="objectives-title">
+                <div class="panel-heading">
+                  <div><p class="eyebrow">MISSION OBJECTIVES</p><h2 id="objectives-title">Launch requirements</h2></div>
+                  <span class="objective-progress" id="objective-progress">0 / 2 COMPLETE</span>
+                </div>
+                <ul class="objective-list" id="objective-list"></ul>
+                <p class="objective-note" id="objective-note" aria-live="polite">Complete both mission objectives before launch.</p>
+              </section>
+
+              <section class="panel systems-panel">
+                <div class="panel-heading systems-heading">
+                  <div><p class="eyebrow">CONCEPT OF OPERATIONS</p><h2>Deploy mission systems</h2></div>
+                  <span class="system-count" id="system-count">0 / 12 DEPLOYED</span>
+                </div>
+                <p class="section-description">Sequence the essential systems before the crew arrives. Some operations depend on others.</p>
+                <div class="system-list" id="system-list"></div>
+              </section>
+              </div>
+            </div>
+
+            <div class="hud-column hud-right" id="right-hud">
+              <div class="hud-drawer-content" id="right-hud-content">
+              <section class="panel status-panel">
+                <div class="panel-heading compact-heading"><div><p class="eyebrow">MISSION STATUS</p><h2>Telemetry</h2></div><span class="status-chip" id="status-chip">PLANNING</span></div>
+                <div class="telemetry-list">
+                  <div class="telemetry-row"><span>CREW HEALTH</span><span class="telemetry-right"><span class="health-indicator" id="health-indicator"></span><b id="health-value">100%</b></span></div>
+                  <div class="telemetry-bar"><span id="health-bar"></span></div>
+                  <div class="telemetry-row"><span>OXYGEN RESERVE</span><span class="telemetry-right"><b id="oxygen-value">100%</b></span></div>
+                  <div class="telemetry-bar"><span id="oxygen-bar"></span></div>
+                  <div class="telemetry-row"><span>FOOD RESERVE</span><span class="telemetry-right"><b id="food-value">100%</b></span></div>
+                  <div class="telemetry-bar"><span id="food-bar"></span></div>
+                  <div class="telemetry-row habitat-row"><span>HABITAT INTEGRITY</span><span class="telemetry-right"><b id="integrity-value">100%</b></span></div>
+                  <div class="telemetry-bar"><span id="integrity-bar"></span></div>
+                </div>
+                <div class="status-footer"><span>MISSION ELAPSED</span><strong id="elapsed-value">00 SOLS</strong></div>
+              </section>
+
+              <section class="panel conditions-panel">
+                <div class="panel-heading compact-heading"><div><p class="eyebrow">MARS ENVIRONMENT</p><h2>Surface conditions</h2></div><span class="weather-icon" aria-hidden="true">☼</span></div>
+                <div class="conditions-grid">
+                  <div class="condition-item"><span class="condition-label">TEMP</span><strong id="temperature-value">−63°<small>C</small></strong></div>
+                  <div class="condition-item"><span class="condition-label">RADIATION</span><strong id="radiation-value">LOW</strong></div>
+                  <div class="condition-item"><span class="condition-label">DUST</span><strong id="dust-value">CLEAR</strong></div>
+                  <div class="condition-item"><span class="condition-label">SOLAR</span><strong id="solar-value">OPTIMAL</strong></div>
+                </div>
+                <p class="conditions-note" id="conditions-note"><span class="condition-pulse"></span>Stable conditions at landing site.</p>
+              </section>
+              <section class="panel log-panel mission-log" id="mission-log" hidden>
+                <div class="panel-heading compact-heading"><div><p class="eyebrow">FLIGHT LOG</p><h2>Mission events</h2></div><span class="log-live"><span class="live-dot"></span>LIVE</span></div>
+                <div class="event-list" id="event-list" aria-live="polite"></div>
+              </section>
+              </div>
+            </div>
+
+            <section class="panel ops-panel hud-director">
+              <div class="ops-copy"><p class="eyebrow">FLIGHT DIRECTOR</p><h2 id="ops-title">Ready for launch?</h2><p id="ops-description">Deploy the systems you need, then advance the mission to see how your plan holds up.</p></div>
+              <button class="advance-button" id="advance-button"><span id="advance-label">ADVANCE MISSION</span><span class="button-arrow" aria-hidden="true">→</span></button>
+            </section>
+          </div>
+          <div class="world-bottomline">
+            <div class="world-bottom-meta">
+              <div class="world-legend"><span><i class="legend-dot habitat-dot"></i>HABITAT</span><span><i class="legend-dot power-dot"></i>POWER</span><span><i class="legend-dot crew-dot"></i>CREW</span></div>
+              <span class="world-controls"><span class="mouse-icon">↗</span> DRAG TO ORBIT <span class="world-divider">·</span> SCROLL TO ZOOM</span>
+            </div>
+          </div>
+          <section class="player-progression world-progression" aria-label="Player progression">
+            <div class="level-chip"><span>LEVEL</span><strong id="player-level">1</strong></div>
+            <div class="xp-display">
+              <div class="xp-caption"><span>EXPERIENCE</span><span id="xp-label">0 / 100 XP</span></div>
+              <div class="xp-track" id="xp-progress" role="progressbar" aria-label="Experience to next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="xp-fill"></span></div>
+            </div>
+            <div class="points-chip"><span>UPGRADE PTS</span><strong id="upgrade-points">0</strong></div>
+          </section>
+          <button class="world-page-button" id="upgrades-screen-button" type="button" data-screen="upgrades" aria-controls="upgrades-slide"><span aria-hidden="true">02</span> UPGRADES <b id="upgrade-button-points">0</b></button>
+          <button class="world-help-button" id="world-help-button" type="button" aria-label="How to play" aria-controls="help-dialog" title="How to play">How To Play</button>
+          <div class="world-warning" id="world-warning" role="status"></div>
+          <noscript>Enable JavaScript to view the 3D Mars simulation.</noscript>
+        </section>
+      </main>
+          </section>
+          <section class="app-slide upgrades-slide" id="upgrades-slide" aria-label="Mission upgrades" aria-hidden="true" inert>
+            <div class="upgrade-main">
+              <div class="upgrade-heading">
+                <div>
+                  <p class="eyebrow">MISSION DEVELOPMENT · CAREER PROGRESSION</p>
+                  <h1>Engineering <span>upgrades.</span></h1>
+                  <p>Spend upgrade points to improve the systems that sustain your crew. Benefits persist between missions.</p>
+                </div>
+              </div>
+              <section class="upgrade-overview" aria-label="Career status">
+                <div class="upgrade-overview-card"><span>COMMANDER LEVEL</span><strong id="upgrade-page-level">1 / 10</strong></div>
+                <div class="upgrade-overview-card"><span>AVAILABLE POINTS</span><strong id="upgrade-page-points">0</strong></div>
+                <div class="upgrade-overview-card"><span>NEXT LEVEL</span><strong id="upgrade-page-xp">0 / 100 XP</strong></div>
+              </section>
+              <div class="upgrade-section-heading">
+                <div><p class="eyebrow">SYSTEMS ENGINEERING</p><h2>Research & development</h2></div>
+                <span>1 POINT PER RANK · 3 RANKS MAX</span>
+              </div>
+              <div class="upgrade-list" id="upgrade-list"></div>
+              <p class="upgrade-feedback" id="upgrade-feedback" role="status" aria-live="polite">Complete a mission to earn 10 XP. Every new level grants an upgrade point.</p>
+              <div class="upgrade-footer">
+                <button class="return-mission-button" id="return-mission" type="button">← RETURN TO MISSION</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <footer class="footer"><span>AXEL <span class="footer-separator">/</span> MISSION SIMULATION</span><span>INSPIRED BY NASA SYSTEMS ENGINEERING</span><span>BUILD FOR THE RED PLANET <span class="footer-mark">↗</span></span></footer>
+    </div>
+    <dialog class="help-dialog" id="help-dialog">
+      <button class="dialog-close" id="close-help" aria-label="Close">×</button>
+      <p class="eyebrow">MISSION BRIEFING</p>
+      <h2>How to prepare and launch</h2>
+      <p>Keep the crew alive for a randomized mission of 4–14 sols. Mission duration, resource budgets, and event odds refresh for every new mission.</p>
+      <ol class="briefing-steps">
+        <li><strong>Review the forecast.</strong> Click <strong>MISSION PLAN</strong> on the left edge, then click <strong>MISSION WEATHER FORECAST</strong> to expand it. Each row shows a Sol, event likelihood, and recommended countermeasure. Each event rolls from 0–99 and occurs only when the roll is below its displayed percentage.</li>
+        <li><strong>Complete launch objectives.</strong> Deploy the two systems listed under <strong>MISSION OBJECTIVES</strong> and marked <strong>REQUIRED</strong>. Objectives change each mission; follow any <strong>REQUIRES</strong> tags to deploy prerequisites. The checklist updates as you deploy, and <strong>ADVANCE MISSION</strong> remains locked until both objectives are complete. Before launch, click <strong>REMOVE</strong> to change your plan; removing a prerequisite also removes its dependent systems. Balance the mass and power meters, and prioritize countermeasures for forecast events.</li>
+        <li><strong>Launch the mission.</strong> Once both current objectives are complete, click <strong>ADVANCE MISSION</strong>. Flight Data opens on the right, and both side menus can stay open together.</li>
+        <li><strong>Manage each Sol.</strong> Click <strong>ADVANCE SOL</strong> to continue. Watch crew health, oxygen, food, habitat integrity, surface conditions, and the flight log. Events are rolled against their displayed likelihoods.</li>
+        <li><strong>Develop your program.</strong> Each completed mission grants 10 XP. Level requirements rise by 100 XP per level through Level 10; every level-up awards an upgrade point. Open <strong>UPGRADES</strong> at the bottom right of the 3D display to spend points on power capacity, oxygen recovery, food production, or crew medical output.</li>
+      </ol>
+      <button class="dialog-action" id="start-help">GOT IT <span>→</span></button>
+    </dialog>
+    <dialog class="outcome-dialog" id="outcome-dialog" aria-labelledby="outcome-title">
+      <button class="dialog-close" id="close-outcome" aria-label="Close mission debrief">×</button>
+      <div class="outcome-emblem" id="outcome-emblem" aria-hidden="true">✓</div>
+      <p class="eyebrow" id="outcome-kicker">MISSION DEBRIEF</p>
+      <h2 id="outcome-title">MISSION SUCCESS</h2>
+      <p class="progression-reward" id="progression-reward" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+      <p class="outcome-description" id="outcome-description"></p>
+      <div class="outcome-stats" id="outcome-stats"></div>
+      <div class="outcome-actions">
+        <button class="outcome-secondary" id="review-flight-log">VIEW FLIGHT LOG</button>
+        <button class="outcome-primary" id="restart-mission">NEW MISSION <span aria-hidden="true">→</span></button>
+      </div>
+    </dialog>
+    <script src="mars-scene.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
